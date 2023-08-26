@@ -1,0 +1,20 @@
+# dependencies
+node_modules
+
+# sst
+.sst
+.build
+cdk.context.json
+.layers
+
+.turbo
+
+# opennext
+.open-next
+
+# misc
+.DS_Store
+*.log
+
+# local env files
+.env*.local
