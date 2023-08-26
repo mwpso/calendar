@@ -5,6 +5,7 @@ export function ApiStack({ stack }: StackContext) {
   const api = new Api(stack, 'api', {
     routes: {
       'GET /calendar': 'packages/functions/src/calendar.yearly',
+      'GET /debug': 'packages/functions/src/calendar.yearlyDebug',
     },
   });
 

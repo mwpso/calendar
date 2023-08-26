@@ -9,11 +9,12 @@ import {
   isAfter,
   isBefore,
 } from 'date-fns';
+import { format as formatTz, utcToZonedTime } from 'date-fns-tz';
 
 import ical from 'node-ical';
 
 const url =
-  'https://calendar.google.com/calendar/ical/c_bdgo9eg22l4eo0gsdf6lnnr358%40group.calendar.google.com/public/basic.ics';
+  'https://calendar.google.com/calendar/ical/c_bdgo9eg22l4eo0gsdf6lnnr358%40group.calendar.google.com/public/basic.ics?ctz=America%2FLos_Angeles';
 
 // Let's start the school year on August 1st.
 const currentYear = new Date().getFullYear();
@@ -24,7 +25,7 @@ export const YEAR_START =
 export const YEAR_END = new Date(currentYear + 1, 6, 31);
 
 interface CalendarEvent {
-  start: ical.DateWithTimeZone;
+  start: Date;
   title: string;
   location: string;
 }
@@ -35,10 +36,12 @@ const formatDates = (events: CalendarEvent[]) => {
     return {
       ...event,
       dow: getDay(event.start),
-      month: format(event.start, 'MMMM'),
+      month: formatTz(event.start, 'MMMM', { timeZone: 'America/Los_Angeles' }),
       monthIdx: getMonth(event.start),
       start: event.start,
-      shortDate: format(event.start, 'M/d'),
+      shortDate: formatTz(event.start, 'M/d', {
+        timeZone: 'America/Los_Angeles',
+      }),
       weekOfMonth: getWeekOfMonth(event.start),
     };
   });
@@ -48,6 +51,7 @@ export const parseEvents = async () => {
   const events = await ical.async.fromURL(url);
 
   const yearsEvents = [];
+  const rawEvents = [];
 
   for (const event of Object.values(events)) {
     if (event.type !== 'VEVENT') continue;
@@ -56,12 +60,25 @@ export const parseEvents = async () => {
     if (isBefore(eventStart, YEAR_START)) continue;
     if (isAfter(eventStart, YEAR_END)) continue;
 
+    rawEvents.push({
+      ...event,
+      startTz: utcToZonedTime(event.start, 'America/Los_Angeles'),
+    });
+
     yearsEvents.push({
-      start: eventStart,
+      start:
+        event.datetype === 'date'
+          ? new Date(
+              [event.start.toISOString().split('T')[0], '07:00:00.000Z'].join(
+                'T'
+              )
+            )
+          : utcToZonedTime(event.start, 'America/Los_Angeles'),
+      dateType: event.datetype,
       title: event.summary,
       location: event.location,
     } as CalendarEvent);
   }
 
-  return formatDates(yearsEvents);
+  return { formatted: formatDates(yearsEvents), raw: rawEvents };
 };
