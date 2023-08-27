@@ -2,7 +2,6 @@ export * as Calendar from './calendar';
 
 import {
   compareAsc,
-  format,
   getDay,
   getMonth,
   getWeekOfMonth,
@@ -10,37 +9,31 @@ import {
   isBefore,
 } from 'date-fns';
 import { format as formatTz, utcToZonedTime } from 'date-fns-tz';
+import { hackPacificTime, schoolYear, timeZone } from './dates';
 
 import ical from 'node-ical';
 
+// Public URL for Google Calendar
 const url =
   'https://calendar.google.com/calendar/ical/c_bdgo9eg22l4eo0gsdf6lnnr358%40group.calendar.google.com/public/basic.ics?ctz=America%2FLos_Angeles';
 
-// Let's start the school year on August 1st.
-const currentYear = new Date().getFullYear();
-const cutOffDate = new Date(currentYear, 7, 1);
-
-export const YEAR_START =
-  cutOffDate > new Date() ? new Date(currentYear - 1, 7, 1) : cutOffDate;
-export const YEAR_END = new Date(currentYear + 1, 6, 31);
-
-interface CalendarEvent {
+interface Event {
   start: Date;
   title: string;
   location: string;
 }
 
-const formatDates = (events: CalendarEvent[]) => {
+const formatDates = (events: Event[]) => {
   const sortedEvents = events.sort((a, b) => compareAsc(a.start, b.start));
   return sortedEvents.map((event) => {
     return {
       ...event,
       dow: getDay(event.start),
-      month: formatTz(event.start, 'MMMM', { timeZone: 'America/Los_Angeles' }),
+      month: formatTz(event.start, 'MMMM', { timeZone }),
       monthIdx: getMonth(event.start),
       start: event.start,
       shortDate: formatTz(event.start, 'M/d', {
-        timeZone: 'America/Los_Angeles',
+        timeZone,
       }),
       weekOfMonth: getWeekOfMonth(event.start),
     };
@@ -48,6 +41,7 @@ const formatDates = (events: CalendarEvent[]) => {
 };
 
 export const parseEvents = async () => {
+  const { start, end } = schoolYear();
   const events = await ical.async.fromURL(url);
 
   const yearsEvents = [];
@@ -57,27 +51,23 @@ export const parseEvents = async () => {
     if (event.type !== 'VEVENT') continue;
     const eventStart = event.start;
     if (!eventStart) continue;
-    if (isBefore(eventStart, YEAR_START)) continue;
-    if (isAfter(eventStart, YEAR_END)) continue;
+    if (isBefore(eventStart, start)) continue;
+    if (isAfter(eventStart, end)) continue;
 
     rawEvents.push({
       ...event,
-      startTz: utcToZonedTime(event.start, 'America/Los_Angeles'),
+      startTz: utcToZonedTime(event.start, timeZone),
     });
 
     yearsEvents.push({
       start:
         event.datetype === 'date'
-          ? new Date(
-              [event.start.toISOString().split('T')[0], '07:00:00.000Z'].join(
-                'T'
-              )
-            )
-          : utcToZonedTime(event.start, 'America/Los_Angeles'),
+          ? hackPacificTime(event.start)
+          : utcToZonedTime(event.start, timeZone),
       dateType: event.datetype,
       title: event.summary,
       location: event.location,
-    } as CalendarEvent);
+    } as Event);
   }
 
   return { formatted: formatDates(yearsEvents), raw: rawEvents };

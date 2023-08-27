@@ -1,14 +1,4 @@
-import {
-  eachDayOfInterval,
-  endOfMonth,
-  endOfWeek,
-  getMonth,
-  parseISO,
-  startOfMonth,
-  startOfWeek,
-} from 'date-fns';
-
-import { CalendarEvent } from '../calendar';
+import { CalendarEvent, buildDates } from '@mwpso/core/src/dates';
 
 function classNames(...classes: (string | boolean)[]) {
   return classes.filter(Boolean).join(' ');
@@ -20,35 +10,8 @@ interface Props {
   monthIdx: number;
 }
 
-const buildDates = (events: CalendarEvent[], monthIdx: number) => {
-  // School year starts in August. monthIdx 0 is August.
-  // So, we need to add 7 to the monthIdx to get the correct month in Date.
-  const dateMonth = monthIdx + 7;
-  const monthStart = startOfMonth(new Date(2023, dateMonth, 1));
-  const monthEnd = endOfMonth(monthStart);
-  const weekStart = startOfWeek(monthStart);
-  const weekEnd = endOfWeek(monthEnd);
-  const dateRange = eachDayOfInterval({ start: weekStart, end: weekEnd });
-  return dateRange.map((date) => {
-    const dayEvents = events.filter((event) => {
-      return parseISO(event.start).getDate() === date.getDate();
-    });
-
-    return {
-      date: date.toISOString().split('T')[0],
-      day: date.getDate(),
-      events: dayEvents,
-      hasEvent: dayEvents.length > 0,
-      isCurrentMonth: getMonth(date) === getMonth(monthStart),
-      isToday:
-        date.toISOString().split('T')[0] ===
-        new Date().toISOString().split('T')[0],
-    };
-  });
-};
-
 export const CalMonth = ({ events = [], month, monthIdx }: Props) => {
-  const days = buildDates(events, monthIdx);
+  const days = buildDates(events, month);
 
   return (
     <div

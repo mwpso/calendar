@@ -1,7 +1,9 @@
 import { Api, StackContext, StaticSite } from 'sst/constructs';
-import { YEAR_END, YEAR_START } from '@mwpso/core/src/calendar';
+
+import { schoolYear } from '@mwpso/core/src/dates';
 
 export function ApiStack({ stack }: StackContext) {
+  const { start, end } = schoolYear();
   const api = new Api(stack, 'api', {
     routes: {
       'GET /calendar': 'packages/functions/src/calendar.yearly',
@@ -15,8 +17,8 @@ export function ApiStack({ stack }: StackContext) {
     buildCommand: 'npm run build',
     environment: {
       VITE_APP_API_URL: api.url,
-      VITE_APP_YEAR_START: String(YEAR_START.getFullYear()),
-      VITE_APP_YEAR_END: String(YEAR_END.getFullYear()),
+      VITE_APP_YEAR_START: String(start.getFullYear()),
+      VITE_APP_YEAR_END: String(end.getFullYear()),
     },
   });
 

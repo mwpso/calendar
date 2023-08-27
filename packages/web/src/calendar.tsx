@@ -1,3 +1,4 @@
+import { CalendarEvent, getMonths } from '@mwpso/core/src/dates';
 import { useEffect, useRef, useState } from 'react';
 
 import { CalMonth } from './components/cal-month';
@@ -10,28 +11,7 @@ const API_URL = import.meta.env.VITE_APP_API_URL;
 const YEAR_START = import.meta.env.VITE_APP_YEAR_START;
 const YEAR_END = import.meta.env.VITE_APP_YEAR_END;
 
-const months = [
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-];
-
-export interface CalendarEvent {
-  location: string;
-  month: string;
-  shortDate: string;
-  start: string;
-  title: string;
-}
+const months = getMonths();
 
 interface Events {
   [month: string]: CalendarEvent[];
