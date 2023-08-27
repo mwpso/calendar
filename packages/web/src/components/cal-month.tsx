@@ -53,7 +53,7 @@ export const CalMonth = ({ events = [], month, monthIdx }: Props) => {
   return (
     <div
       className={classNames(
-        'mt-8 md:grid md:grid-cols-2 md:h-80 md:divide-gray-200'
+        'mt-8 md:grid md:grid-cols-2 md:h-64 md:divide-gray-200'
       )}
     >
       <div className="md:p-2">
@@ -62,7 +62,7 @@ export const CalMonth = ({ events = [], month, monthIdx }: Props) => {
             {month}
           </div>
         </div>
-        <div className="mt-2 grid grid-cols-7 font-semibold text-center text-xs leading-6 text-gray-700">
+        <div className="mt-2 grid grid-cols-7 font-semibold text-center text-xs text-gray-700">
           <div>S</div>
           <div>M</div>
           <div>T</div>
@@ -101,7 +101,7 @@ export const CalMonth = ({ events = [], month, monthIdx }: Props) => {
                     'bg-sky-300',
                   !day.hasEvent && 'hover:bg-sky-100',
                   (day.hasEvent || day.isToday) && 'font-semibold',
-                  'mx-auto flex h-8 w-8 items-center justify-center rounded-full'
+                  'mx-auto flex h-5 w-5 items-center justify-center rounded-full'
                 )}
               >
                 <time dateTime={day.date}>{day.isCurrentMonth && day.day}</time>
@@ -113,20 +113,20 @@ export const CalMonth = ({ events = [], month, monthIdx }: Props) => {
       <section
         className={classNames(
           monthIdx < 6 && '-order-1 text-right',
-          'mt-12 md:mt-0 md:p-2'
+          'mt-12 md:mt-0 md:p-1'
         )}
       >
-        <h2 className="text-base font-semibold leading-6 text-gray-900">
+        <h2 className="text-base font-semibold text-gray-900">
           Schedule for {month}
         </h2>
-        <ol className="mt-1 space-y-0 text-sm leading-6 text-gray-500">
+        <ol className="mt-1 space-y-0 text-sm text-gray-500">
           {events.map((event, eventIdx) => (
             <li
               key={eventIdx}
-              className="group flex items-center space-x-4 rounded-xl px-4 py-0 focus-within:bg-gray-100 hover:bg-gray-100"
+              className="group flex items-center space-x-4 rounded-xl py-px px-0 focus-within:bg-gray-100 hover:bg-gray-100"
             >
               <div className="flex-auto">
-                <p className="text-gray-900">
+                <p className="text-gray-900 text-xs">
                   <span className="font-semibold">{event.shortDate}</span>{' '}
                   {event.title}
                 </p>
