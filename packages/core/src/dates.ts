@@ -23,7 +23,7 @@ export interface CalendarEvent {
 }
 
 export const cutOffDate = () => {
-  const currentYear = new Date().getFullYear();
+  const currentYear = new Date().getFullYear() - 1;
   // Let's start the school year calendar view on August 1st.
   const cutoffDay = 1;
   const cutOffMonth = 7; // August
