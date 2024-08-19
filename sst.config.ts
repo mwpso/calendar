@@ -6,7 +6,7 @@ export default {
     return {
       name: 'mwpso',
       region: 'us-west-2',
-      profile: 'wise',
+      profile: 'pso',
     };
   },
   stacks(app) {
