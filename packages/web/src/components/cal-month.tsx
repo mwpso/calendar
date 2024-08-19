@@ -16,7 +16,7 @@ export const CalMonth = ({ events = [], month, monthIdx }: Props) => {
   return (
     <div
       className={classNames(
-        'mt-8 md:grid md:grid-cols-2 md:h-64 md:divide-gray-200'
+        'mt-4 md:grid md:grid-cols-2 md:h-64 md:divide-gray-200'
       )}
     >
       <div className="md:p-2">
