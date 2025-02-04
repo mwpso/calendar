@@ -22,12 +22,23 @@ export interface CalendarEvent {
   title: string;
 }
 
+const getCurrentSchoolYear = () => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const cutoffMonth = 7; // August
+
+  // If we're before August, we're in the previous school year
+  if (now.getMonth() < cutoffMonth) {
+    return currentYear - 1;
+  }
+  return currentYear;
+};
+
 export const cutOffDate = () => {
-  const currentYear = new Date().getFullYear();
   // Let's start the school year calendar view on August 1st.
   const cutoffDay = 1;
   const cutOffMonth = 7; // August
-  return new Date(currentYear, cutOffMonth, cutoffDay);
+  return new Date(getCurrentSchoolYear(), cutOffMonth, cutoffDay);
 };
 
 export const getMonths = () => {
